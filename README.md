@@ -16,6 +16,9 @@ Ce projet est une amélioration d'un jeu de bataille de chars. Vous contrôlez u
   - `cannonBallUp` : augmente le diamètre et la vitesse des boulets de canon
 - Ajout d'un zombie boss (non tuable pour l'instant) qui invoque des "dudes" toutes les x secondes.
 
+###Résolution bugs
+-Les boulets de canon ne travers plus plusieurs dude à la fois.
+
 ## Comment jouer
 - Clonez ou téléchargez le dépôt
 - Ouvrez le fichier `index.html` dans un navigateur web compatible avec WebGL
