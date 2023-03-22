@@ -265,7 +265,7 @@ function createTank(scene) {
             }
             this.cannonBallSizeMultiplier *= 1.5;
             this.cannonBallSpeedMultiplier *= 1.5;
-            this.piercing=true;
+           
         }
     }
     
