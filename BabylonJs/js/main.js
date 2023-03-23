@@ -18,8 +18,8 @@ function startGame() {
 
     // modify some default settings (i.e pointer events to prevent cursor to go 
     // out of the game window)
-    modifySettings();  
-    
+    modifySettings();
+
     let zombieBoss = scene.getMeshByName("zombieBoss")
 
     zombieBoss.invokeDudes();
@@ -27,12 +27,12 @@ function startGame() {
 
     let tank = scene.getMeshByName("heroTank");
     spawnPerksInterval(scene, tank);
-    
+
     engine.runRenderLoop(() => {
         let deltaTime = engine.getDeltaTime(); // remind you something ?
         tank.move();
         tank.fireCannonBalls(); // will fire only if space is pressed !
-        tank.fireLasers();  
+        tank.fireLasers();
         //moveHeroDude();
         moveOtherDudes();
         scene.render();
@@ -49,7 +49,7 @@ function createScene() {
 
 
     let tank = createTank(scene);
-    spawnPerks(scene,tank);
+    spawnPerks(scene, tank);
     // second parameter is the target to follow
     let followCamera = createFollowCamera(scene, tank);
     scene.activeCamera = followCamera;
@@ -72,7 +72,7 @@ function createGround(scene) {
         groundMaterial.diffuseTexture.uScale = 50;
         groundMaterial.diffuseTexture.vScale = 50;
         ground.material = groundMaterial;
-        
+
         // to be taken into account by collision detection
         ground.checkCollisions = true;
         //groundMaterial.wireframe=true;
@@ -126,7 +126,7 @@ function createFollowCamera(scene, target) {
 
 function createTank(scene) {
     let tank = new BABYLON.Mesh("heroTank", scene);
-    BABYLON.SceneLoader.ImportMesh("", "./models/Tank/", "m26.glb", scene, function (meshes) {          
+    BABYLON.SceneLoader.ImportMesh("", "./models/Tank/", "m26.glb", scene, function (meshes) {
         let imported = meshes[0];
         imported.parent = tank
 
@@ -187,7 +187,7 @@ function createTank(scene) {
     tank.fireCannonBallsAfter = 0.5; // in seconds
     tank.cannonBallSizeMultiplier = 1;
     tank.cannonBallSpeedMultiplier = 1;
-    
+
 
     tank.fireCannonBalls = function () {
         if (!inputStates.space) return;
@@ -204,7 +204,7 @@ function createTank(scene) {
 
 
         // Create a canonball
-        let cannonball = BABYLON.MeshBuilder.CreateSphere("cannonball", { diameter: 2*this.cannonBallSizeMultiplier, segments: 32 }, scene);
+        let cannonball = BABYLON.MeshBuilder.CreateSphere("cannonball", { diameter: 2 * this.cannonBallSizeMultiplier, segments: 32 }, scene);
         cannonball.material = new BABYLON.StandardMaterial("Fire", scene);
         cannonball.material.diffuseTexture = new BABYLON.Texture("images/Fire.jpg", scene)
         cannonball.canKill = true;
@@ -224,7 +224,7 @@ function createTank(scene) {
         // we apply it to the center of the sphere
         let powerOfFire = 100;
         let azimuth = 0.1;
-        let aimForceVector = new BABYLON.Vector3(this.frontVector.x * powerOfFire* this.cannonBallSpeedMultiplier, (this.frontVector.y + azimuth) * powerOfFire * this.cannonBallSpeedMultiplier, this.frontVector.z * powerOfFire * this.cannonBallSpeedMultiplier);
+        let aimForceVector = new BABYLON.Vector3(this.frontVector.x * powerOfFire * this.cannonBallSpeedMultiplier, (this.frontVector.y + azimuth) * powerOfFire * this.cannonBallSpeedMultiplier, this.frontVector.z * powerOfFire * this.cannonBallSpeedMultiplier);
 
         cannonball.physicsImpostor.applyImpulse(aimForceVector, cannonball.getAbsolutePosition());
         cannonball.actionManager = new BABYLON.ActionManager(scene);
@@ -246,16 +246,20 @@ function createTank(scene) {
 
                         // Marquer le canonball comme ayant tué un dude
                     }
+                 
                 }
 
             ));
         });
+        setTimeout(() => {
+            cannonball.dispose();
+        }, 1000 * 4);
 
     }
 
-    tank.applyPerk = function(perkName) {
+    tank.applyPerk = function (perkName) {
         if (perkName === "speedUp") {
-            if(this.speed >= 2.5) return;
+            if (this.speed >= 2.5) return;
             this.speed *= 1.5;
         } else if (perkName === "fireRateUp") {
             this.fireCannonBallsAfter /= 2;
@@ -265,10 +269,10 @@ function createTank(scene) {
             }
             this.cannonBallSizeMultiplier *= 1.5;
             this.cannonBallSpeedMultiplier *= 1.5;
-           
+            this.piercing = true;
         }
     }
-    
+
 
     // to avoid firing too many cannonball rapidly
     tank.canFireLasers = true;
@@ -339,24 +343,25 @@ function createTank(scene) {
     return tank;
 }
 
-function createZombie(scene){
+function createZombie(scene) {
     let zombieBoss = new BABYLON.Mesh("zombieBoss", scene)
     BABYLON.SceneLoader.ImportMesh("", "models/", "zombie.glb", scene, (newMeshes, particleSystems, skeletons) => {
         let zombie = newMeshes[0];
         zombie.parent = zombieBoss
-        
+
         zombie.position = new BABYLON.Vector3(0, 0, 25);
         zombie.scaling = new BABYLON.Vector3(8, 8, 8);
-}); 
+    });
 
-    
-    
-    zombieBoss.invokeDudes = function() {
+
+
+    zombieBoss.invokeDudes = function () {
         setInterval(() => {
-            if(scene.dudes===undefined) return;
-            if (scene.dudes.length > 20) return; 
+            if (scene.dudes === undefined) return;
+            if (scene.dudes.length > 20) return;
             createHeroDude(scene);
             console.log("More dudes are coming! hahahaha");
+            console.log(scene.dudes);
         }, 20000);
     };
 
@@ -366,10 +371,10 @@ function createZombie(scene){
 
 function checkDudes() {
     // iterate on each dude
-    if(scene.dudes===undefined) return;
+    if (scene.dudes === undefined) return;
     scene.dudes.forEach(dude => {
         if (dude.Dude.speed < 0.7)
-        dude.Dude.speed += 0.0005;
+            dude.Dude.speed += 0.0005;
         // if the dude is killed, we remove it from the array
         if (dude.isKilled) {
             let index = scene.dudes.indexOf(dude);
@@ -398,19 +403,22 @@ function createHeroDude(scene) {
         let hero = new Dude(heroDude, -1, 0.3, 0.2, scene);
 
         // make clones
-        scene.dudes = [];
+        if (!scene.dudes) {
+            scene.dudes = [];
+        }
         for (let i = 0; i < 10; i++) {
-            scene.dudes[i] = doClone(heroDude, skeletons, i);
-            scene.beginAnimation(scene.dudes[i].skeleton, 0, 120, true, 1);
+            let newHeroDude = doClone(heroDude, skeletons, i);
+            scene.beginAnimation(newHeroDude.skeleton, 0, 120, true, 1);
 
             // Create instance with move method etc.
             // params = speed, scaling, scene
-            var temp = new Dude(scene.dudes[i], i, 0.3, 0.2, scene);
+            var temp = new Dude(newHeroDude, i, 0.3, 0.2, scene);
             // remember that the instances are attached to the meshes
             // and the meshes have a property "Dude" that IS the instance
             // see render loop then....
+            scene.dudes.push(newHeroDude);
         }
-        scene.dudes.push(heroDude);
+        scene.dudes.push(heroDude)
 
     });
 }
@@ -504,7 +512,7 @@ function spawnPerks(scene, tank) {
         time += 0.01;
         perks.forEach(perk => {
             if (perk.isDisposed()) return;
-            perk.position.y =  8 + Math.sin(time * 10) * 2;
+            perk.position.y = 8 + Math.sin(time * 10) * 2;
         });
     });
 }
